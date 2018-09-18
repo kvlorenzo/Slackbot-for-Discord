@@ -1,0 +1,5 @@
+# Removes formats based on personal computer
+*.xml
+
+# Database
+*.db

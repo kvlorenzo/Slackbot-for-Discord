@@ -17,10 +17,15 @@ class Response:
         self.client = client
 
     @commands.command(pass_context=True)
-    async def response(self, ctx):
+    async def response(self, ctx, task="help", *args):
         user = ctx.message.author
         channel = ctx.message.channel
-        print(user, channel)
+        server = ctx.message.server
+        print(user, channel, server)
+        print(user.id, channel.id, server.id)
+        for l in ctx.message.mentions:
+            print("Mentioned", l)
+        print("Task:", task)
         await self.client.say("Response command called")
 
 
