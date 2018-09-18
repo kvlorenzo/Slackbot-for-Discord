@@ -8,5 +8,6 @@ setup(
     license='MIT',
     author='Kyle Lorenzo',
     author_email='kvlorenz@ucsd.edu',
-    description='A Discord bot with slackbot functionality'
+    description='A Discord bot with slackbot functionality',
+    requires=['discord']
 )

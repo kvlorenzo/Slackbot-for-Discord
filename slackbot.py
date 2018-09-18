@@ -11,7 +11,8 @@ except ImportError:
           "https://github.com/Rapptz/discord.py for installation instructions.")
     sys.exit(1)
 
-token = "NDg4OTU4ODAxMDUyMTcyMjkw.Dnjyvg.Ys7qQ2N_Jk-brciE3j5y4ONKVVM"
+TOKEN = "NDg4OTU4ODAxMDUyMTcyMjkw.Dnjyvg.Ys7qQ2N_Jk-brciE3j5y4ONKVVM"
+COGS = ["cogs.reminder", "cogs.response"]
 
 bot = commands.Bot(command_prefix="/")
 
@@ -27,4 +28,28 @@ async def on_ready():
     print("Number of Members:", len(list(bot.get_all_members())))
 
 
-bot.run(token)
+@bot.command()
+async def load(cog):
+    try:
+        bot.load_extension(cog)
+        print("Loaded {}".format(cog))
+    except Exception as err:
+        print("{} failed to load [{}]".format(cog, err))
+
+
+@bot.command()
+async def unload(cog):
+    try:
+        bot.unload_extension(cog)
+        print("Loaded {}".format(cog))
+    except Exception as err:
+        print("{} failed to load [{}]".format(cog, err))
+
+
+if __name__ == "__main__":
+    for c in COGS:
+        try:
+            bot.load_extension(c)
+        except Exception as e:
+            print("{} failed to load [{}]".format(c, e))
+        bot.run(TOKEN)
