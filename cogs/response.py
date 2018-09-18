@@ -17,7 +17,7 @@ class Response:
         self.client = client
 
     @commands.command(pass_context=True)
-    async def response(self, ctx, *args):
+    async def response(self, ctx):
         user = ctx.message.author
         channel = ctx.message.channel
         print(user, channel)

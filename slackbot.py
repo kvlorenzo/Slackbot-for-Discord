@@ -52,4 +52,4 @@ if __name__ == "__main__":
             bot.load_extension(c)
         except Exception as e:
             print("{} failed to load [{}]".format(c, e))
-        bot.run(TOKEN)
+    bot.run(TOKEN)

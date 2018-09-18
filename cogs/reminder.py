@@ -13,16 +13,16 @@ except ImportError:
 
 
 class Reminder:
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, client):
+        self.client = client
 
-    @commands.command()
-    async def remind(self, ctx, *args):
+    @commands.command(pass_context=True)
+    async def remind(self, ctx):
         user = ctx.message.author
         channel = ctx.message.channel
         print(user, channel)
-        await self.bot.say("Remind command called")
+        await self.client.say("Remind command called")
 
 
-def setup(bot):
-    bot.add_cog(Reminder(bot))
+def setup(client):
+    client.add_cog(Reminder(client))
