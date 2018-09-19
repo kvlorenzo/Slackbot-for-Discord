@@ -18,15 +18,34 @@ class Response:
 
     @commands.command(pass_context=True)
     async def response(self, ctx, task="help", *args):
-        user = ctx.message.author
-        channel = ctx.message.channel
-        server = ctx.message.server
-        print(user, channel, server)
-        print(user.id, channel.id, server.id)
-        for l in ctx.message.mentions:
-            print("Mentioned", l)
-        print("Task:", task)
+        member_info = {
+            "user_id": ctx.message.author.id,
+            "channel_id": ctx.message.channel.id,
+            "server_id": ctx.message.server.id
+        }
+        await self.parse_args(member_info, args)
+        if task == "create":
+            '''TODO - PARSE ARGUMENT AND ADD TO DATABASE'''
+        elif task == "delete":
+            '''TODO - SEARCH MESSAGE IN DATABASE TO DELETE'''
+        elif task == "list":
+            '''TODO - PAGINATE THE MESSAGES IN THE CURRENT SERVER'''
+        elif task == "clear":
+            '''TODO - REMOVE ALL MESSAGES FROM SERVER IN DATABASE'''
+        else:
+            '''TODO - CREATE EMBEDDED MESSAGE FOR HELP'''
         await self.client.say("Response command called")
+
+    async def parse_args(self, member_info, args):
+        if len(args) > 2:
+            await self.create_help_msg()
+            return
+        msg = args[0]
+        response = args[1]
+        # TODO: CALL THE ADD TO DATABASE FUNCTION HERE
+
+    async def create_help_msg(self):
+        await self.client.say("TODO: Create help message here")
 
 
 def setup(client):
