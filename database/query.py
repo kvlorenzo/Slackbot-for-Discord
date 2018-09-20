@@ -11,6 +11,8 @@ class Query:
                        "AND channel_id = :channel_id AND user_id = :user_id",
                        member_dict)
         data = self.c.fetchall()
+        if len(data) < 1:
+            return None
         return data[0][0]
 
     def close(self):

@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 
 from database import query
@@ -14,19 +15,24 @@ class Entry:
     # }
     def __init__(self, db, member_dict):
         self.db = db
-        self.conn = sqlite3.connect(db)
+        self.conn = sqlite3.connect(self.db)
         self.c = self.conn.cursor()
+        self.query = query.Query(self.db)
         self.member_dict = member_dict
 
     def add_response(self, msg, response):
-        member_id = query.Query(self.db)
+        date_added = datetime.datetime
+        member_id = self.query.get_member_id(self.member_dict)
+        self.c.execute("INSERT INTO responses VALUES (null, ?, ?, ?, ?",
+                       (date_added, member_id, msg, response))
 
     def add_member(self):
-        with self.conn:
-            self.c.execute("INSERT INTO members VALUES "
-                           "(null, :server_id, :channel_id, :user_id)",
-                           self.member_dict)
-            self.conn.commit()
+        if self.query.get_member_id(self.member_dict) is None:
+            with self.conn:
+                self.c.execute("INSERT INTO members VALUES "
+                               "(null, :server_id, :channel_id, :user_id)",
+                               self.member_dict)
+                self.conn.commit()
 
     def close(self):
         self.conn.commit()
