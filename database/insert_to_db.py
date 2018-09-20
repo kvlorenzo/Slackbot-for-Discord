@@ -21,10 +21,12 @@ class Entry:
         self.member_dict = member_dict
 
     def add_response(self, msg, response):
-        date_added = datetime.datetime
+        date_added = datetime.datetime.utcnow()
+        self.add_member()
         member_id = self.query.get_member_id(self.member_dict)
-        self.c.execute("INSERT INTO responses VALUES (null, ?, ?, ?, ?",
+        self.c.execute("INSERT INTO responses VALUES (null, ?, ?, ?, ?)",
                        (date_added, member_id, msg, response))
+        self.conn.commit()
 
     def add_member(self):
         if self.query.get_member_id(self.member_dict) is None:
@@ -37,3 +39,13 @@ class Entry:
     def close(self):
         self.conn.commit()
         self.conn.close()
+
+
+ex_d = {
+    "server_id": 789,
+    "channel_id": 456,
+    "user_id": 123
+}
+
+en = Entry("server.db", ex_d)
+en.add_response("Hi", "Hello")

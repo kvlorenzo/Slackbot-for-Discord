@@ -15,6 +15,16 @@ class Query:
             return None
         return data[0][0]
 
+    def get_msg_response(self, server_id, msg):
+        self.c.execute("SELECT response FROM responses WHERE member_id IN "
+                       "(SELECT id from members WHERE server_id = ?)"
+                       " AND message = ? COLLATE NOCASE",
+                       (server_id, msg))
+        response = self.c.fetchall()
+        if len(response) < 1:
+            return None
+        return response[0][0]
+
     def close(self):
         self.conn.commit()
         self.conn.close()
