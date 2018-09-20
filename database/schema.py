@@ -1,41 +1,46 @@
 import sqlite3
 
-conn = sqlite3.connect("server.db")
-c = conn.cursor()
 
-members_table = """
-CREATE TABLE members (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    server_id INTEGER,
-    channel id INTEGER,
-    user_id INTEGER
-)
-"""
+class Schema:
+    def __init__(self, db):
+        self.conn = sqlite3.connect(db)
+        self.c = self.conn.cursor()
 
-responses_table = """
-CREATE TABLE responses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date_added INTEGER,
-    member_id INTEGER,
-    message TEXT,
-    response TEXT
-)
-"""
+    def create_tables(self):
+        members_table = """
+        CREATE TABLE IF NOT EXISTS members (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            server_id INTEGER,
+            channel_id INTEGER,
+            user_id INTEGER
+        )
+        """
 
-reminders_table = """
-CREATE TABLE reminders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date_added INTEGER,
-    member_author_id INTEGER,
-    member_receiver_id INTEGER,
-    receiver_type TEXT,
-    message TEXT,
-    send_time INTEGER
-)
-"""
-c.execute(members_table)
-c.execute(responses_table)
-c.execute(reminders_table)
+        responses_table = """
+        CREATE TABLE IF NOT EXISTS responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_added INTEGER,
+            member_id INTEGER,
+            message TEXT,
+            response TEXT
+        )
+        """
 
-conn.commit()
-conn.close()
+        reminders_table = """
+        CREATE TABLE IF NOT EXISTS reminders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_added INTEGER,
+            member_author_id INTEGER,
+            member_receiver_id INTEGER,
+            receiver_type TEXT,
+            message TEXT,
+            send_time INTEGER
+        )
+        """
+        self.c.execute(members_table)
+        self.c.execute(responses_table)
+        self.c.execute(reminders_table)
+
+    def close_db(self):
+        self.conn.commit()
+        self.conn.close()

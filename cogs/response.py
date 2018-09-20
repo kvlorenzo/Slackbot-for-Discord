@@ -18,12 +18,12 @@ class Response:
 
     @commands.command(pass_context=True)
     async def response(self, ctx, task="help", *args):
-        member_info = {
-            "user_id": ctx.message.author.id,
+        member_dict = {
+            "server_id": ctx.message.server.id,
             "channel_id": ctx.message.channel.id,
-            "server_id": ctx.message.server.id
+            "user_id": ctx.message.author.id
         }
-        await self.parse_args(member_info, args)
+        await self.parse_args(member_dict, args)
         if task == "create":
             '''TODO - PARSE ARGUMENT AND ADD TO DATABASE'''
         elif task == "delete":
@@ -36,7 +36,7 @@ class Response:
             '''TODO - CREATE EMBEDDED MESSAGE FOR HELP'''
         await self.client.say("Response command called")
 
-    async def parse_args(self, member_info, args):
+    async def parse_args(self, member_dict, args):
         if len(args) > 2:
             await self.create_help_msg()
             return
