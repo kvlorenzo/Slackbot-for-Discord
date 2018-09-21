@@ -1,6 +1,7 @@
 import sys
 
 from database import insert_to_db
+from database import query
 
 try:
     import discord
@@ -48,6 +49,14 @@ class Response:
                      "Message: " + msg + "\n" + \
                      "Response: " + response
         await self.client.say(result_str)
+
+    async def on_message(self, message):
+        # This prevents bot from reading its own messages in on_message
+        if not message.author.bot:
+            q = query.Query("database/server.db")
+            response = q.get_msg_response(message.server.id, message.content)
+            if response is not None:
+                await self.client.send_message(message.channel, response)
 
     async def create_help_msg(self):
         await self.client.say("TODO: Add help message here")
