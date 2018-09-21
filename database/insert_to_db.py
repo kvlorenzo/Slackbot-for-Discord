@@ -39,13 +39,3 @@ class Entry:
     def close(self):
         self.conn.commit()
         self.conn.close()
-
-
-ex_d = {
-    "server_id": 789,
-    "channel_id": 456,
-    "user_id": 123
-}
-
-en = Entry("server.db", ex_d)
-en.add_response("Hi", "Hello")

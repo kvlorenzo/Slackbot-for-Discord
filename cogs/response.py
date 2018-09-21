@@ -1,5 +1,7 @@
 import sys
 
+from database import insert_to_db
+
 try:
     import discord
     from discord.ext import commands
@@ -23,9 +25,8 @@ class Response:
             "channel_id": ctx.message.channel.id,
             "user_id": ctx.message.author.id
         }
-        await self.parse_args(member_dict, args)
         if task == "create":
-            '''TODO - PARSE ARGUMENT AND ADD TO DATABASE'''
+            await self.parse_msg_and_response(member_dict, args)
         elif task == "delete":
             '''TODO - SEARCH MESSAGE IN DATABASE TO DELETE'''
         elif task == "list":
@@ -34,18 +35,22 @@ class Response:
             '''TODO - REMOVE ALL MESSAGES FROM SERVER IN DATABASE'''
         else:
             '''TODO - CREATE EMBEDDED MESSAGE FOR HELP'''
-        await self.client.say("Response command called")
 
-    async def parse_args(self, member_dict, args):
-        if len(args) > 2:
+    async def parse_msg_and_response(self, member_dict, args):
+        if len(args) != 2:
             await self.create_help_msg()
             return
         msg = args[0]
         response = args[1]
-        # TODO: CALL THE ADD TO DATABASE FUNCTION HERE
+        entry = insert_to_db.Entry("database/server.db", member_dict)
+        entry.add_response(msg, response)
+        result_str = "Response added\n" + \
+                     "Message: " + msg + "\n" + \
+                     "Response: " + response
+        await self.client.say(result_str)
 
     async def create_help_msg(self):
-        await self.client.say("TODO: Create help message here")
+        await self.client.say("TODO: Add help message here")
 
 
 def setup(client):
