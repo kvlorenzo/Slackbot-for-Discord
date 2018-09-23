@@ -1,5 +1,6 @@
 import sys
 
+from database import delete_from_db
 from database import insert_to_db
 from database import query
 
@@ -29,7 +30,7 @@ class Response:
         if task == "create":
             await self.parse_msg_and_response(member_dict, args)
         elif task == "delete":
-            '''TODO - SEARCH MESSAGE IN DATABASE TO DELETE'''
+            await self.parse_del_args(member_dict["server_id"], args)
         elif task == "list":
             '''TODO - PAGINATE THE MESSAGES IN THE CURRENT SERVER'''
         elif task == "clear":
@@ -49,6 +50,28 @@ class Response:
                      "Message: " + msg + "\n" + \
                      "Response: " + response
         await self.client.say(result_str)
+
+    async def parse_del_args(self, server_id, args):
+        if not args or len(args) < 2:
+            await self.create_help_msg()
+            return
+        deletion = delete_from_db.Deletion("database/server.db")
+        msg_type = args[0]
+        input_str = " ".join(args[1:])
+        if msg_type == "message":
+            if not deletion.del_msg(server_id, input_str):
+                err_str = "Error. Can't find the message: " + input_str
+                await self.client.say(err_str)
+            else:
+                await self.client.say("Message deleted")
+        elif msg_type == "response":
+            if not deletion.del_response(server_id, input_str):
+                err_str = "Error. Can't find the response: " + input_str
+                await self.client.say(err_str)
+            else:
+                await self.client.say("Response deleted")
+        else:
+            await self.create_help_msg()
 
     async def on_message(self, message):
         # This prevents bot from reading its own messages in on_message
