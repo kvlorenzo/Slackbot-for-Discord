@@ -37,6 +37,21 @@ class Deletion:
         self.conn.commit()
         return True
 
+    def del_all_responses(self, server_id):
+        # Checks responses exist in the database
+        self.c.execute("SELECT * FROM responses WHERE member_id IN "
+                       "(SELECT id from members WHERE server_id = ?)",
+                       (server_id,))
+        result = self.c.fetchall()
+        if len(result) < 1:
+            return False
+        self.c.execute("DELETE FROM responses WHERE member_id IN "
+                       "(SELECT id from members WHERE server_id = ?)",
+                       (server_id,))
+        self.conn.commit()
+        return True
+
+
     def close(self):
         self.conn.commit()
         self.conn.close()

@@ -34,7 +34,7 @@ class Response:
         elif task == "list":
             '''TODO - PAGINATE THE MESSAGES IN THE CURRENT SERVER'''
         elif task == "clear":
-            '''TODO - REMOVE ALL MESSAGES FROM SERVER IN DATABASE'''
+            await self.clear_responses(member_dict["server_id"])
         else:
             '''TODO - CREATE EMBEDDED MESSAGE FOR HELP'''
 
@@ -80,6 +80,13 @@ class Response:
             response = q.get_msg_response(message.server.id, message.content)
             if response is not None:
                 await self.client.send_message(message.channel, response)
+
+    async def clear_responses(self, server_id):
+        deletion = delete_from_db.Deletion("database/server.db")
+        if not deletion.del_all_responses(server_id):
+            await self.client.say("Error: Could not clear the responses")
+        else:
+            await self.client.say("Responses cleared.")
 
     async def create_help_msg(self):
         await self.client.say("TODO: Add help message here")
