@@ -25,6 +25,13 @@ class Query:
             return None
         return response[0][0]
 
+    def get_all_responses(self, server_id):
+        self.c.execute("SELECT message, response FROM responses WHERE "
+                       "member_id IN "
+                       "(SELECT id from members WHERE server_id = ?)",
+                       (server_id,))
+        return self.c.fetchall()
+
     def close(self):
         self.conn.commit()
         self.conn.close()

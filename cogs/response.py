@@ -1,3 +1,4 @@
+import math
 import sys
 
 from database import delete_from_db
@@ -32,7 +33,7 @@ class Response:
         elif task == "delete":
             await self.parse_del_args(member_dict["server_id"], args)
         elif task == "list":
-            '''TODO - PAGINATE THE MESSAGES IN THE CURRENT SERVER'''
+            await self.display_list(member_dict["server_id"], args)
         elif task == "clear":
             await self.clear_responses(member_dict["server_id"])
         else:
@@ -87,6 +88,49 @@ class Response:
             await self.client.say("Error: Could not clear the responses")
         else:
             await self.client.say("Responses cleared.")
+
+    async def display_list(self, server_id, args):
+        # Hard-coded value that can change in the future
+        msg_per_pg = 1
+        q = query.Query("database/server.db")
+
+        # Responses will hold a tuple of all the messages and the corresponding
+        # responses like so:
+        # ((msg1, resp1), (msg2, resp2), (msg3, resp3))
+        responses = q.get_all_responses(server_id)
+        resp_len = len(responses)
+
+        # pg is current page number - if over the page limit, default = last pg
+        pg = 1
+        if args and str(args[0]).isdigit():
+            pg = min(math.floor(resp_len / msg_per_pg), int(args[0]))
+            if pg <= 0:
+                pg = 1
+
+        # The start_idx is the index where the first item in the list will
+        # be found in the tuple. It's calculated by multiplying the page number
+        # by the messages per page and subtracting messages per page
+        #  Ex. page 2 for 10 msg per page -> (2 * 10) - 10 = start at idx 10
+        start_idx = (msg_per_pg * pg) - msg_per_pg
+        # Calculates how many items will appear on the page. This will be the
+        # default messages per page or less if the current page will hold less
+        # items
+        items_in_pg = min(msg_per_pg, resp_len - start_idx)
+
+        msg_list = ""
+        for i in range(start_idx, start_idx + items_in_pg):
+            msg_list += "Message: " + responses[i][0] + "\n" + \
+                        "Response: " + responses[i][1] + "\n\n"
+        print(msg_list, "Length:", len(msg_list))
+        embed = discord.Embed(
+            title="Automatic responses",
+            description="\u200b",
+            colour=discord.Colour.orange()
+        )
+        embed.add_field(name="\u200b", value=msg_list, inline=False)
+        embed.set_footer(text="Page " + str(pg) + " of " +
+                              str(math.ceil(resp_len / items_in_pg)))
+        await self.client.say(embed=embed)
 
     async def create_help_msg(self):
         await self.client.say("TODO: Add help message here")
