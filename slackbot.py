@@ -1,5 +1,7 @@
 import sys
 
+import config
+
 try:
     import discord
     from discord.ext import commands
@@ -11,10 +13,10 @@ except ImportError:
           "https://github.com/Rapptz/discord.py for installation instructions.")
     sys.exit(1)
 
-TOKEN = "NDg4OTU4ODAxMDUyMTcyMjkw.Dnjyvg.Ys7qQ2N_Jk-brciE3j5y4ONKVVM"
-COGS = ["cogs.reminder", "cogs.response"]
+TOKEN = config.TOKEN
+COGS = config.cogs
 
-bot = commands.Bot(command_prefix="/")
+bot = commands.Bot(command_prefix=config.cmd_prefix)
 
 
 @bot.event

@@ -1,6 +1,7 @@
 import math
 import sys
 
+import config
 from database import delete_from_db
 from database import insert_to_db
 from database import query
@@ -45,7 +46,7 @@ class Response:
             return
         msg = args[0]
         response = args[1]
-        entry = insert_to_db.Entry("database/server.db", member_dict)
+        entry = insert_to_db.Entry(config.db, member_dict)
         entry.add_response(msg, response)
         result_str = "Response added\n" + \
                      "Message: " + msg + "\n" + \
@@ -56,7 +57,7 @@ class Response:
         if not args or len(args) < 2:
             await self.create_help_msg()
             return
-        deletion = delete_from_db.Deletion("database/server.db")
+        deletion = delete_from_db.Deletion(config.db)
         msg_type = args[0]
         input_str = " ".join(args[1:])
         if msg_type == "message":
@@ -77,13 +78,13 @@ class Response:
     async def on_message(self, message):
         # This prevents bot from reading its own messages in on_message
         if not message.author.bot:
-            q = query.Query("database/server.db")
+            q = query.Query(config.db)
             response = q.get_msg_response(message.server.id, message.content)
             if response is not None:
                 await self.client.send_message(message.channel, response)
 
     async def clear_responses(self, server_id):
-        deletion = delete_from_db.Deletion("database/server.db")
+        deletion = delete_from_db.Deletion(config.db)
         if not deletion.del_all_responses(server_id):
             await self.client.say("Error: Could not clear the responses")
         else:
@@ -92,13 +93,16 @@ class Response:
     async def display_list(self, server_id, args):
         # Hard-coded value that can change in the future
         msg_per_pg = 1
-        q = query.Query("database/server.db")
+        q = query.Query(config.db)
 
         # Responses will hold a tuple of all the messages and the corresponding
         # responses like so:
         # ((msg1, resp1), (msg2, resp2), (msg3, resp3))
         responses = q.get_all_responses(server_id)
         resp_len = len(responses)
+        if resp_len < 1:
+            await self.client.say("No responses found")
+            return
 
         # pg is current page number - if over the page limit, default = last pg
         pg = 1
@@ -121,7 +125,6 @@ class Response:
         for i in range(start_idx, start_idx + items_in_pg):
             msg_list += "Message: " + responses[i][0] + "\n" + \
                         "Response: " + responses[i][1] + "\n\n"
-        print(msg_list, "Length:", len(msg_list))
         embed = discord.Embed(
             title="Automatic responses",
             description="\u200b",
