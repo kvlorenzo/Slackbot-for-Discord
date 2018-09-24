@@ -37,7 +37,7 @@ class Response:
         elif task == "clear":
             await self.clear_responses(member_dict["server_id"])
         else:
-            '''TODO - CREATE EMBEDDED MESSAGE FOR HELP'''
+            await self.create_help_msg()
 
     async def parse_msg_and_response(self, member_dict, args):
         if len(args) != 2:
@@ -133,7 +133,29 @@ class Response:
         await self.client.say(embed=embed)
 
     async def create_help_msg(self):
-        await self.client.say("TODO: Add help message here")
+        embed = discord.Embed(
+            title="Help page for response commands",
+            description="\u200b",
+            colour=discord.Colour.orange()
+        )
+        embed.add_field(name="Help", value="/response help", inline=False)
+        embed.add_field(name="Create a Response",
+                        value="/response create [\"message\"] [\"response\"]\n"
+                              "(without brackets - NOTE: message and response "
+                              "must be in quotations)\n\n",
+                        inline=False)
+        embed.add_field(name="Delete a Response by Message",
+                        value="/response delete message [\"message\"]\n"
+                              "(without brackets, quotes not required)\n\n",
+                        inline=False)
+        embed.add_field(name="Delete a Response by Response",
+                        value="/response delete message [\"response\"]\n"
+                              "(without brackets, quotes not required)",
+                        inline=False)
+        embed.add_field(name="Display all active responses",
+                        value="/response list",
+                        inline=False)
+        await self.client.say(embed=embed)
 
 
 def setup(client):
