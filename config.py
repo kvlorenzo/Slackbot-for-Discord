@@ -12,7 +12,7 @@
 # This will give you instructions for how to start a bot. After creating the
 # bot, find the area that says "token," and copy and paste the token into the
 # variable below
-TOKEN = ""
+TOKEN = "https://github.com/kvlorenzo/Slackbot-for-Discord"
 
 # The character that precedes every command used.
 cmd_prefix = "/"
