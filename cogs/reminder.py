@@ -18,9 +18,11 @@ class Reminder:
 
     @commands.command(pass_context=True)
     async def remind(self, ctx):
-        user = ctx.message.author
-        channel = ctx.message.channel
-        print(user, channel)
+        member_dict = {
+            "server_id": ctx.message.server.id,
+            "channel_id": ctx.message.channel.id,
+            "user_id": ctx.message.author.id
+        }
         await self.client.say("Remind command called")
 
 

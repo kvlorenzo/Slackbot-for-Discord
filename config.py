@@ -2,6 +2,7 @@
 # Variables that need setting are the following:
 # - Token
 # - Command prefix
+# - Cogs
 # - database - path and name
 
 
@@ -11,13 +12,15 @@
 # This will give you instructions for how to start a bot. After creating the
 # bot, find the area that says "token," and copy and paste the token into the
 # variable below
-TOKEN = "NDg4OTU4ODAxMDUyMTcyMjkw.Dnjyvg.Ys7qQ2N_Jk-brciE3j5y4ONKVVM"
+TOKEN = ""
 
 # The character that precedes every command used.
 cmd_prefix = "/"
 
+# The files that contain the commands
 cogs = ["cogs.reminder", "cogs.response"]
 
+# The path and name of the database
 database_path = "database/"
 database_name = "server.db"
 db = database_path + database_name
