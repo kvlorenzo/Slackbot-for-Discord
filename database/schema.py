@@ -29,10 +29,10 @@ class Schema:
         reminders_table = """
         CREATE TABLE IF NOT EXISTS reminders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            member_id INTEGER,
             date_added INTEGER,
-            member_author_id INTEGER,
-            member_receiver_id INTEGER,
-            receiver_type TEXT,
+            recipient_type TEXT,
+            recipient_id INTEGER,
             message TEXT,
             send_time INTEGER
         )

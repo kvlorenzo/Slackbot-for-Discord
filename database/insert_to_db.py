@@ -28,6 +28,15 @@ class Entry:
                        (date_added, member_id, msg, response))
         self.conn.commit()
 
+    def add_reminder(self, recipient_type, recipient_id, msg, send_time):
+        date_added = datetime.datetime.utcnow()
+        self.add_member()
+        member_id = self.query.get_member_id(self.member_dict)
+        self.c.execute("INSERT INTO reminders VALUES (null, ?, ?, ?, ?, ?, ?)",
+                       (member_id, date_added, recipient_type, recipient_id,
+                        msg, send_time))
+        self.conn.commit()
+
     def add_member(self):
         if self.query.get_member_id(self.member_dict) is None:
             with self.conn:

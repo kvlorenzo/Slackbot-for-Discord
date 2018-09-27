@@ -1,5 +1,10 @@
 import sys
 
+import dateparser
+
+import config
+from database import insert_to_db
+
 try:
     import discord
     from discord.ext import commands
@@ -17,7 +22,7 @@ class Reminder:
         self.client = client
 
     @commands.command(pass_context=True)
-    async def remind(self, ctx, task_or_recipient="help", msg="", time=""):
+    async def remind(self, ctx, task_or_recipient="help", msg="", send_time=""):
         member_dict = {
             "server_id": ctx.message.server.id,
             "channel_id": ctx.message.channel.id,
@@ -44,27 +49,38 @@ class Reminder:
             else:
                 self.create_help_msg()
                 return
-            recipient_info = self.parse_recipient(recipient_symbol,
-                                                  task_or_recipient[2:-1],
-                                                  mentions)
-            if recipient_info is not None:
-                self.update_reminder(member_dict, recipient_info, msg, time)
+            recipient_id = await self.parse_recipient(task_or_recipient[2:-1],
+                                                      mentions)
+            if recipient_id is not None:
+                await self.update_reminder(member_dict, ctx.message.server,
+                                           recipient_symbol, recipient_id,
+                                           msg, send_time)
 
-    async def update_reminder(self, member_dict, recipient_info, msg, time):
-        """TODO: Add to sql database"""
-
-    async def parse_recipient(self, recipient_symbol, recipient, mentions):
-        recipient_list = [recipient_symbol]
-        for mention in mentions:
-            if mention == recipient:
-                recipient_list.append(recipient)
-        if len(recipient_list) <= 1:
+    async def update_reminder(self, member_dict, server, recipient_symbol,
+                              recipient_id, msg, send_time):
+        send_time_utc = dateparser.parse(send_time)
+        if send_time is None:
             self.create_help_msg()
-            return None
-        return recipient_list
+            return
+        entry = insert_to_db.Entry(config.db, member_dict)
+        entry.add_reminder(recipient_symbol, recipient_id, msg, send_time_utc)
+        if recipient_symbol == "#":
+            recipient = str(server.channel(recipient_id))
+        else:
+            recipient = str(server.get_member(recipient_id))
+        result_str = "Will remind " + recipient + " at " + \
+                     str(send_time_utc.ctime()) + " (UTC time) " + msg
+        await self.client.say(result_str)
+
+    async def parse_recipient(self, recipient, mentions):
+        for mention in mentions:
+            if mention.id == recipient:
+                return recipient
+        return None
 
     async def create_help_msg(self):
         await self.client.say("I am a help message. Make me.")
+
 
 def setup(client):
     client.add_cog(Reminder(client))

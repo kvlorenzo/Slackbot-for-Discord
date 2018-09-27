@@ -1,6 +1,7 @@
 import sys
 
 import config
+from database import schema
 
 try:
     import discord
@@ -54,4 +55,6 @@ if __name__ == "__main__":
             bot.load_extension(c)
         except Exception as e:
             print("{} failed to load [{}]".format(c, e))
+    db = schema.Schema(config.db)
+    db.create_tables()
     bot.run(TOKEN)
