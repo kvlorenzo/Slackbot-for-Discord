@@ -1,3 +1,4 @@
+import asyncio
 import sys
 
 import dateparser
@@ -80,6 +81,14 @@ class Reminder:
 
     async def create_help_msg(self):
         await self.client.say("I am a help message. Make me.")
+
+    async def send_reminders(self):
+        print("Send reminders called")
+        await self.client.wait_until_ready()
+        while not self.client.is_closed:
+            await self.client.say("I am a test reminder")
+            print("Test")
+            await asyncio.sleep(10)
 
 
 def setup(client):

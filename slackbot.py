@@ -1,6 +1,7 @@
 import sys
 
 import config
+from cogs import reminder
 from database import schema
 
 try:
@@ -58,3 +59,4 @@ if __name__ == "__main__":
     db = schema.Schema(config.db)
     db.create_tables()
     bot.run(TOKEN)
+    bot.loop.create_task(reminder.Reminder(bot).send_reminders())
