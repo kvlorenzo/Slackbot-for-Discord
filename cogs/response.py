@@ -92,7 +92,7 @@ class Response:
 
     async def display_list(self, server_id, args):
         # Hard-coded value that can change in the future
-        msg_per_pg = 1
+        msg_per_pg = 10
         q = query.Query(config.db)
 
         # Responses will hold a tuple of all the messages and the corresponding

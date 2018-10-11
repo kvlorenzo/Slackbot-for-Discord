@@ -32,6 +32,18 @@ class Query:
                        (server_id,))
         return self.c.fetchall()
 
+    def get_all_server_reminders(self, server_id):
+        self.c.execute("SELECT send_time, message FROM reminders WHERE "
+                       "member_id IN "
+                       "(SELECT id from members WHERE server_id = ?)",
+                       (server_id,))
+        return self.c.fetchall()
+
+    def get_current_reminders(self):
+        self.c.execute("SELECT recipient_type, recipient_id, message FROM "
+                       "reminders where send_time <= date('now')")
+        return self.c.fetchall()
+
     def close(self):
         self.conn.commit()
         self.conn.close()
