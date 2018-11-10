@@ -61,7 +61,7 @@ class Deletion:
             return False
         self.c.execute("DELETE FROM reminders WHERE member_id IN "
                        "(SELECT id from members WHERE server_id = ?)"
-                       " AND response = ? COLLATE NOCASE",
+                       " AND message = ? COLLATE NOCASE",
                        (server_id, reminder))
         self.conn.commit()
         return True

@@ -86,12 +86,18 @@ class Reminder:
     async def send_reminders(self):
         await self.client.wait_until_ready()
         q = query.Query(config.db)
+        deletion = delete_from_db.Deletion(config.db)
         while not self.client.is_closed:
             # Reminders tuple: {recipient_type, recipient_id, message}
             reminders = q.get_current_reminders()
             for reminder in reminders:
-                recipient = discord.Object(id=reminder[1])
+                if reminder[0] == '@':
+                    recipient = self.get_user(reminder[1])
+                else:
+                    recipient = self.get_channel(reminder[1])
+                server_id = recipient.server.id
                 await self.client.send_message(recipient, reminder[2])
+                deletion.del_reminder(server_id, reminder[2])
             await asyncio.sleep(10)
 
     async def del_reminder(self, server_id, msg):
@@ -177,6 +183,21 @@ class Reminder:
                         value="/reminder list",
                         inline=False)
         await self.client.say(embed=embed)
+
+    def get_channel(self, channel_id):
+        channels = self.client.get_all_channels()
+        for channel in channels:
+            if channel.id == str(channel_id):
+                return channel
+        return None
+
+    def get_user(self, user_id):
+        users = self.client.get_user_info()
+        for user in users:
+            if user.id == str(user_id):
+                return user
+        return None
+
 
 def setup(client):
     client.add_cog(Reminder(client))
