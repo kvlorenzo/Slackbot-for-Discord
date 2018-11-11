@@ -66,6 +66,21 @@ class Deletion:
         self.conn.commit()
         return True
 
+    def del_user_reminder(self, user_id, reminder):
+        self.c.execute("SELECT * FROM reminders WHERE member_id IN "
+                       "(SELECT id from members WHERE user_id = ?)"
+                       " AND message = ? COLLATE NOCASE",
+                       (user_id, reminder))
+        result = self.c.fetchall()
+        if len(result) < 1:
+            return False
+        self.c.execute("DELETE FROM reminders WHERE member_id IN "
+                       "(SELECT id from members WHERE user_id = ?)"
+                       " AND message = ? COLLATE NOCASE",
+                       (user_id, reminder))
+        self.conn.commit()
+        return True
+
     def del_all_reminders(self, server_id):
         # Checks responses exist in the database
         self.c.execute("SELECT * FROM reminders WHERE member_id IN "

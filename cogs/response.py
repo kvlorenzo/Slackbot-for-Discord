@@ -77,7 +77,7 @@ class Response:
 
     async def on_message(self, message):
         # This prevents bot from reading its own messages in on_message
-        if not message.author.bot:
+        if not message.author.bot and message.server is not None:
             q = query.Query(config.db)
             response = q.get_msg_response(message.server.id, message.content)
             if response is not None:
@@ -155,8 +155,11 @@ class Response:
                         value="/response delete message [\"response\"]\n"
                               "(without brackets, quotes not required)",
                         inline=False)
-        embed.add_field(name="Display all active responses",
+        embed.add_field(name="Display All Active Responses",
                         value="/response list",
+                        inline=False)
+        embed.add_field(name="Clear All Active Responses",
+                        value="/response clear",
                         inline=False)
         await self.client.say(embed=embed)
 

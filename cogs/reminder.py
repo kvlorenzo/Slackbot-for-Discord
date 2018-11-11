@@ -51,7 +51,7 @@ class Reminder:
             elif recipient_symbol == "#":
                 mentions = ctx.message.channel_mentions
             else:
-                self.create_help_msg()
+                await self.create_help_msg()
                 return
             recipient_id = await self.parse_recipient(task_or_recipient[2:-1],
                                                       mentions)
@@ -92,12 +92,14 @@ class Reminder:
             reminders = q.get_current_reminders()
             for reminder in reminders:
                 if reminder[0] == '@':
-                    recipient = self.get_user(reminder[1])
+                    recipient = await self.client.get_user_info(reminder[1])
+                    await self.client.send_message(recipient, reminder[2])
+                    deletion.del_user_reminder(reminder[1], reminder[2])
                 else:
                     recipient = self.get_channel(reminder[1])
-                server_id = recipient.server.id
-                await self.client.send_message(recipient, reminder[2])
-                deletion.del_reminder(server_id, reminder[2])
+                    server_id = recipient.server.id
+                    await self.client.send_message(recipient, reminder[2])
+                    deletion.del_reminder(server_id, reminder[2])
             await asyncio.sleep(10)
 
     async def del_reminder(self, server_id, msg):
@@ -123,10 +125,10 @@ class Reminder:
         msg_per_pg = 10
         q = query.Query(config.db)
 
-        # Responses will hold a tuple of all the messages and the corresponding
-        # responses like so:
-        # ((msg1, resp1), (msg2, resp2), (msg3, resp3))
+        # Reminders will hold a tuple of all the messages and times like so:
+        # ((time1, reminder1), (time2, reminder2), (time3, reminder3))
         reminders = q.get_all_server_reminders(server_id)
+        print(reminders)
         rem_len = len(reminders)
         if rem_len < 1:
             await self.client.say("No responses found")
@@ -171,16 +173,20 @@ class Reminder:
         )
         embed.add_field(name="Help", value="/remind help", inline=False)
         embed.add_field(name="Create a Reminder",
-                        value="/remind [\"user or channel\"] [\"reminder\"]\n"
-                              "(without brackets - NOTE: recipient & reminder "
+                        value="/remind [\"user/channel\"] [\"reminder\"] "
+                              "[\"time\"]\n"
+                              "(without brackets - NOTE: reminder & time "
                               "must be in quotations)\n\n",
                         inline=False)
         embed.add_field(name="Delete a Reminder",
-                        value="/reminder delete [\"remind message\"]\n"
+                        value="/remind delete [\"remind message\"]\n"
                               "(without brackets, quotes required)",
                         inline=False)
-        embed.add_field(name="Display all active reminders",
-                        value="/reminder list",
+        embed.add_field(name="Display All Active Reminders",
+                        value="/remind list",
+                        inline=False)
+        embed.add_field(name="Clear All Active Reminders",
+                        value="/remind clear",
                         inline=False)
         await self.client.say(embed=embed)
 
@@ -189,13 +195,6 @@ class Reminder:
         for channel in channels:
             if channel.id == str(channel_id):
                 return channel
-        return None
-
-    def get_user(self, user_id):
-        users = self.client.get_user_info()
-        for user in users:
-            if user.id == str(user_id):
-                return user
         return None
 
 
