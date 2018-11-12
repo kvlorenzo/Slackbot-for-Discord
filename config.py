@@ -12,7 +12,7 @@
 # This will give you instructions for how to start a bot. After creating the
 # bot, find the area that says "token," and copy and paste the token into the
 # variable below
-TOKEN = ""
+TOKEN = "NDg4OTU4ODAxMDUyMTcyMjkw.DskWwQ.mwZUIbKye0ZBowpY7yR4Z1RbeiU"
 
 # The character that precedes every command used.
 cmd_prefix = "/"

@@ -3,3 +3,6 @@
 
 # Database
 *.db
+
+# config.py -> ensures users enter their own token
+config.py

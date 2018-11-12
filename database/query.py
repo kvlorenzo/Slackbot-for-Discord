@@ -41,7 +41,7 @@ class Query:
 
     def get_current_reminders(self):
         self.c.execute("SELECT recipient_type, recipient_id, message FROM "
-                       "reminders where send_time <= date('now')")
+                       "reminders where send_time <= datetime('now')")
         return self.c.fetchall()
 
     def close(self):

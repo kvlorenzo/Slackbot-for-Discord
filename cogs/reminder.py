@@ -1,8 +1,10 @@
 import asyncio
 import math
 import sys
+from datetime import datetime
 
 import dateparser
+import pytz
 
 import config
 from database import delete_from_db
@@ -62,19 +64,27 @@ class Reminder:
 
     async def update_reminder(self, member_dict, server, recipient_symbol,
                               recipient_id, msg, send_time):
+        date_time_fmt = '%Y-%m-%d %H:%M:%S'
         send_time_utc = dateparser.parse(send_time)
-        if send_time is None:
+        if send_time_utc is None:
             err_str = "Sorry. I couldn't understand the time. Please try again."
             await self.client.say(err_str)
             return
+        time_str = str(send_time_utc).partition('.')[0]
+        send_time_utc_str = datetime.strptime(time_str, date_time_fmt)
+
+        pst_tz = pytz.timezone('America/Los_Angeles')
+        loc_time = pst_tz.localize(send_time_utc_str)
+        parsed_time = loc_time.astimezone(pytz.utc)
         entry = insert_to_db.Entry(config.db, member_dict)
-        entry.add_reminder(recipient_symbol, recipient_id, msg, send_time_utc)
+        entry.add_reminder(recipient_symbol, recipient_id, msg, parsed_time)
         if recipient_symbol == "#":
             recipient = str(server.get_channel(recipient_id))
         else:
             recipient = str(server.get_member(recipient_id))
-        result_str = "Will remind " + recipient + " at " + \
-                     str(send_time_utc.ctime()) + " (UTC time) " + msg
+        result_time = loc_time.strftime("%a, %B %d, %Y at %I:%M:%S")
+        result_str = "Will remind " + recipient + " on " + \
+                     result_time + " (PST time) " + "\"" + msg + "\""
         await self.client.say(result_str)
 
     async def parse_recipient(self, recipient, mentions):
@@ -128,7 +138,6 @@ class Reminder:
         # Reminders will hold a tuple of all the messages and times like so:
         # ((time1, reminder1), (time2, reminder2), (time3, reminder3))
         reminders = q.get_all_server_reminders(server_id)
-        print(reminders)
         rem_len = len(reminders)
         if rem_len < 1:
             await self.client.say("No responses found")
