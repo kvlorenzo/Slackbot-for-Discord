@@ -101,14 +101,15 @@ class Reminder:
             # Reminders tuple: {recipient_type, recipient_id, message}
             reminders = q.get_current_reminders()
             for reminder in reminders:
+                remind_msg = "Reminder: " + reminder[2]
                 if reminder[0] == '@':
                     recipient = await self.client.get_user_info(reminder[1])
-                    await self.client.send_message(recipient, reminder[2])
+                    await self.client.send_message(recipient, remind_msg)
                     deletion.del_user_reminder(reminder[1], reminder[2])
                 else:
                     recipient = self.get_channel(reminder[1])
                     server_id = recipient.server.id
-                    await self.client.send_message(recipient, reminder[2])
+                    await self.client.send_message(recipient, remind_msg)
                     deletion.del_reminder(server_id, reminder[2])
             await asyncio.sleep(10)
 
