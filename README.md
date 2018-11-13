@@ -33,7 +33,7 @@ As you can see, our bot allows you to set your own automated messages. Whether i
 
 But the fun doesn't stop there. Users can also set future reminders to send messages at a particular time. Here's a demo of the reminder:
 
-![slackbot_reminder_demo](https://user-images.githubusercontent.com/35363207/48341315-99983b00-e621-11e8-9269-f2ecb56ca794.gif)
+![slackbot_reminder_demo1](https://user-images.githubusercontent.com/35363207/48385411-436bdc00-e6a3-11e8-88b4-a5cc7adb3607.gif)
 
 Pretty cool, huh?
 
